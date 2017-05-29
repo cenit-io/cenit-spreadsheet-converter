@@ -1,0 +1,28 @@
+{
+  "name": "cenit-spreadsheet-converter",
+  "version": "1.0.0",
+  "description": "Module to integrate and persist the data of the node application generated with SpreadsheetConverter.",
+  "main": "CenitIOController.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cenit-io/cenit-spreadsheet-converter.git"
+  },
+  "author": {
+    "name": "Yoandry Pacheco Aguila",
+    "email": "yoandrypa@gmail.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cenit-io/cenit-spreadsheet-converter/issues"
+  },
+  "homepage": "https://github.com/cenit-io/cenit-spreadsheet-converter",
+  "keywords": [
+    "cenit-io", "SpreadsheetConverter"
+  ],
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "request": "^2.79.0",
+    "underscore": "^1.8.3",
+    "utils": "^0.3.1"
+  }
+}
