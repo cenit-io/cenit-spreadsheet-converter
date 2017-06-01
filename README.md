@@ -1,4 +1,4 @@
-# SpreadsheetConverter Node.js adaptor for Cenit-IO
+# SpreadsheetConverter Node.js adaptor for CenitIO
 
 [![N|Solid](http://www.spreadsheetconverter.com/wp-content/uploads/2013/08/logo.png)](http://www.spreadsheetconverter.com)
 
@@ -54,3 +54,29 @@ app.post('/postform', function(req, res){
     });
 });
 ```
+
+That's it, you are done with server part. 
+Now come to the final part to edit, yes you are right, let's give the client side page a server address to post the form. 
+Go to views folder and open index.ejs in editor, now at html form tag, change the default action url: 
+'https://www.spreadsheetserver.com/server1/g/submit/submit.aspx' to your node server '/postform'. 
+
+The index.ejs may look similar to this:
+ 
+```html
+<!DOCTYPE HTML>
+<!-- saved from url=(0013)about:internet -->
+<html>
+...
+
+        <form id='formc' name='formc' method='post' action='/postform' target='_top'>
+            ...
+        </form>
+...
+</html>            
+```
+
+You are done now, you have configured the SpreadsheetConverter Node.js calculator app to your CenitIO Tenant to persist your form.
+
+Start your node app and you are good to go!
+
+Just hit the Submit button on webpage to test it out!

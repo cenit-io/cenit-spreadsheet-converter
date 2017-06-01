@@ -6,7 +6,6 @@ var util = require('util'),
     request = require('request');
 
 module.exports = {
-
     /**
      * Init process to send form data to CenitIO platform.
      *
@@ -104,6 +103,7 @@ module.exports = {
     },
 
     /**
+     * Create and return data type record with given name and namespace.
      *
      * @param baUrl {String} Base URL to CenitIO API.
      * @param uaKey {String} CenitIO user access key.
@@ -155,7 +155,7 @@ module.exports = {
      * @returns {Object}
      */
     parseData: function (formData) {
-        var item = {}
+        var item = {};
 
         Object.keys(formData).forEach(function (key) {
             if (!key.match(/^xl_/)) item[key] = this.parseValue(formData[key]);
@@ -221,6 +221,13 @@ module.exports = {
         }
     },
 
+    /**
+     * Render view.
+     *
+     * @param status {Integer} Http response status.
+     * @param msg {String} Response message
+     * @returns {String} Response html
+     */
     renderView: function (status, msg) {
         // TODO: Customise view.
         var tmpl = '' +
