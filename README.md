@@ -58,7 +58,7 @@ app.post('/postform', function(req, res){
 That's it, you are done with server part. 
 Now come to the final part to edit, yes you are right, let's give the client side page a server address to post the form. 
 Go to views folder and open index.ejs in editor, now at html form tag, change the default action url: 
-'https://www.spreadsheetserver.com/server1/g/submit/submit.aspx' to your node server '/postform'. 
+**https://www.spreadsheetserver.com/server1/g/submit/submit.aspx** to your node server **/postform**. 
 
 The index.ejs may look similar to this:
  
@@ -66,11 +66,10 @@ The index.ejs may look similar to this:
 <!DOCTYPE HTML>
 <!-- saved from url=(0013)about:internet -->
 <html>
-...
-
-        <form id='formc' name='formc' method='post' action='/postform' target='_top'>
-            ...
-        </form>
+  ...
+  <form id='formc' name='formc' method='post' action='/postform' target='_top'>
+    ...
+  </form>
 ...
 </html>            
 ```
