@@ -8,9 +8,10 @@ your form to your CenitIO Tenant.
 
 ### Installation
 
-Install cenit-spreadsheet-converter in your app by typing following in command prompt.
+Install app dependencies and cenit-spreadsheet-converter in your app by typing following in command prompt.
 
 ```sh
+npm install
 npm install cenit-io/cenit-spreadsheet-converter --save
 ```
 
