@@ -55,7 +55,7 @@ module.exports = {
     saveDataInDataType: function (baUrl, uaKey, uaToken, dataType, formData, callback) {
         var vThis = this,
             options = {
-            url: util.format('%s/%s/%s.json', baUrl, dataType.namespace.toLowerCase(), dataType.name),
+            url: util.format('%s/%s/%s.json', baUrl, dataType.namespace.toLowerCase(), dataType.slug),
             headers: this.headers(uaKey, uaToken),
             method: 'POST',
             json: true,
