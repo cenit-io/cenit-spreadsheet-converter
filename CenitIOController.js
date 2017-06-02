@@ -55,12 +55,12 @@ module.exports = {
     saveDataInDataType: function (baUrl, uaKey, uaToken, dataType, formData, callback) {
         var vThis = this,
             options = {
-            url: util.format('%s/%s/%s.json', baUrl, dataType.namespace.toLowerCase(), dataType.slug),
-            headers: this.headers(uaKey, uaToken),
-            method: 'POST',
-            json: true,
-            body: formData
-        };
+                url: util.format('%s/%s/%s.json', baUrl, dataType.namespace.toLowerCase(), dataType.slug),
+                headers: this.headers(uaKey, uaToken),
+                method: 'POST',
+                json: true,
+                body: formData
+            };
 
         request(options, function (err, response, resData) {
             var msg, status;
@@ -114,17 +114,18 @@ module.exports = {
      * @param callback
      */
     createDataType: function (baUrl, uaKey, uaToken, dtNamespace, dtName, formData, callback) {
-        var options = {
-            url: util.format('%s/setup/json_data_type.json', baUrl),
-            headers: this.headers(uaKey, uaToken),
-            method: 'POST',
-            json: true,
-            body: {
-                namespace: dtNamespace,
-                name: dtName,
-                schema: this.parseJsonSchema(formData)
-            }
-        };
+        var schema = this.parseJsonSchema(formData),
+            options = {
+                url: util.format('%s/setup/json_data_type.json', baUrl),
+                headers: this.headers(uaKey, uaToken),
+                method: 'POST',
+                json: true,
+                body: {
+                    namespace: dtNamespace,
+                    name: dtName,
+                    schema: schema
+                }
+            };
 
         request(options, function (err, response, resData) {
             if (err || resData.summary) return callback(err || resData.summary);
