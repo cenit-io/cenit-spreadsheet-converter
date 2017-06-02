@@ -11,7 +11,7 @@ module.exports = {
      *
      * @param formData {Object} Form data to be seved.
      * @param CenitIO {Object} CenitIO connection setting.
-     * @param callback {Function} Callback function with error and response message parameters.
+     * @param callback {Function} Callback function with status and menssage response parameters.
      */
     saveFormData: function (formData, CenitIO, callback) {
         var vThis = this;
@@ -20,7 +20,7 @@ module.exports = {
         formData = this.parseData(formData);
 
         vThis.validate(CenitIO, function (err) {
-            if (err) return callback(err);
+            if (err) return callback(500, vThis.renderView(500, err));
 
             var uaKey = CenitIO.userAccessKey.trim(),
                 uaToken = CenitIO.userAccessToken.trim(),
@@ -29,12 +29,12 @@ module.exports = {
                 baUrl = CenitIO.baseApiUrl.trim().replace(/\/$/, '');
 
             vThis.getDataType(baUrl, uaKey, uaToken, dtNamespace, dtName, function (err, dataType) {
-                if (err) return callback(err);
+                if (err) return callback(500, vThis.renderView(500, err));
                 if (dataType) {
                     vThis.saveDataInDataType(baUrl, uaKey, uaToken, dataType, formData, callback);
                 } else {
                     vThis.createDataType(baUrl, uaKey, uaToken, dtNamespace, dtName, formData, function (err, dataType) {
-                        if (err) return callback(err);
+                        if (err) return callback(500, vThis.renderView(500, err));
                         vThis.saveDataInDataType(baUrl, uaKey, uaToken, dataType, formData, callback);
                     });
                 }
@@ -50,7 +50,7 @@ module.exports = {
      * @param uaToken {String} CenitIO user access token.
      * @param dataType {Object} Data type record.
      * @param formData {Object} Form data to be seved.
-     * @param callback {Function} Callback function with error and data type record record parameters.
+     * @param callback {Function} Callback function with status and menssage response parameters.
      */
     saveDataInDataType: function (baUrl, uaKey, uaToken, dataType, formData, callback) {
         var vThis = this,
@@ -85,7 +85,7 @@ module.exports = {
      * @param uaToken {String} CenitIO user access token.
      * @param dtNamespace {String} Data type namespace.
      * @param dtName {String} Data type name.
-     * @param callback {Function} Callback function with error and data type record record parameters.
+     * @param callback {Function} Callback function with error and data type record parameters.
      */
     getDataType: function (baUrl, uaKey, uaToken, dtNamespace, dtName, callback) {
         var options = {
@@ -98,7 +98,7 @@ module.exports = {
 
         request(options, function (err, response, resData) {
             if (err || resData.summary) return callback(err || resData.summary);
-            callback(null, resData.json_data_types[0])
+            callback(null, resData.json_data_types[0]);
         });
     },
 
@@ -111,7 +111,7 @@ module.exports = {
      * @param dtNamespace {String} Data type namespace.
      * @param dtName {String} Data type name.
      * @param formData {Object} Form data to be seved.
-     * @param callback
+     * @param callback {Function} Callback function with error and data type record parameters.
      */
     createDataType: function (baUrl, uaKey, uaToken, dtNamespace, dtName, formData, callback) {
         var schema = this.parseJsonSchema(formData),
@@ -173,7 +173,7 @@ module.exports = {
      */
     parseType: function (value) {
         // TODO: Parse field value type.
-        return 'string'
+        return 'string';
     },
 
     /**
@@ -184,7 +184,7 @@ module.exports = {
      */
     parseValue: function (value) {
         // TODO: Parse field value.
-        return value
+        return value;
     },
 
     /**
@@ -204,7 +204,7 @@ module.exports = {
         if (isValid(CenitIO.dataType)) return callback(util.format(errMsg, 'dataType'));
         if (isValid(CenitIO.baseApiUrl)) return callback(util.format(errMsg, 'baseApiUrl'));
 
-        callback()
+        callback();
     },
 
     /**
@@ -219,7 +219,7 @@ module.exports = {
             'Content-Type': 'application/json',
             'X-User-Access-Key': uaKey,
             'X-User-Access-Token': uaToken
-        }
+        };
     },
 
     /**
@@ -235,6 +235,6 @@ module.exports = {
             '<div style="border: 1px solid gray; background-color: %s; padding: 1.5em; text-align: center;">%s</div>' +
             '<script type="text/javascript">setTimeout(function () { window.location = "/" }, 5000)</script>';
 
-        return util.format(tmpl, status == 500 ? 'red' : '#c9e2b3', msg);
+        return util.format(tmpl, status == 500 ? 'red' : '#c9e2b3', msg.toString());
     }
 };
