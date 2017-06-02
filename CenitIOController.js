@@ -194,7 +194,7 @@ module.exports = {
      * @param callback {Function} Callback function with error parameter.
      */
     validate: function (CenitIO, callback) {
-        var errMsg = 'CenitIO.%s is a required string, please set it to the json file.',
+        var errMsg = 'CenitIO.%s is a required string, please set it to the config.json file.',
             isValid = function (v) {
                 return typeof v == 'String' && v.trim() != ''
             };
