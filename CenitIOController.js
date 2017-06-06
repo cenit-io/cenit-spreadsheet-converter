@@ -22,20 +22,20 @@ module.exports = {
         vThis.validate(CenitIO, function (err) {
             if (err) return callback(500, vThis.renderView(500, err));
 
-            var uaKey = CenitIO.userAccessKey.trim(),
-                uaToken = CenitIO.userAccessToken.trim(),
+            var taKey = CenitIO.tenantAccessKey.trim(),
+                taToken = CenitIO.tenantAccessToken.trim(),
                 dtName = CenitIO.dataTypeName.trim(),
                 dtNamespace = CenitIO.dataTypeNamespace.trim(),
                 baUrl = CenitIO.baseApiUrl.trim().replace(/\/$/, '');
 
-            vThis.getDataType(baUrl, uaKey, uaToken, dtNamespace, dtName, function (err, dataType) {
+            vThis.getDataType(baUrl, taKey, taToken, dtNamespace, dtName, function (err, dataType) {
                 if (err) return callback(500, vThis.renderView(500, err));
                 if (dataType) {
-                    vThis.saveDataInDataType(baUrl, uaKey, uaToken, dataType, formData, callback);
+                    vThis.saveDataInDataType(baUrl, taKey, taToken, dataType, formData, callback);
                 } else {
-                    vThis.createDataType(baUrl, uaKey, uaToken, dtNamespace, dtName, formData, function (err, dataType) {
+                    vThis.createDataType(baUrl, taKey, taToken, dtNamespace, dtName, formData, function (err, dataType) {
                         if (err) return callback(500, vThis.renderView(500, err));
-                        vThis.saveDataInDataType(baUrl, uaKey, uaToken, dataType, formData, callback);
+                        vThis.saveDataInDataType(baUrl, taKey, taToken, dataType, formData, callback);
                     });
                 }
             });
@@ -46,17 +46,17 @@ module.exports = {
      * Send form data to CenitIO platform.
      *
      * @param baUrl {String} Base URL to CenitIO API.
-     * @param uaKey {String} CenitIO user access key.
-     * @param uaToken {String} CenitIO user access token.
+     * @param taKey {String} CenitIO tenant access key.
+     * @param taToken {String} CenitIO tenant access token.
      * @param dataType {Object} Data type record.
      * @param formData {Object} Form data to be seved.
      * @param callback {Function} Callback function with status and menssage response parameters.
      */
-    saveDataInDataType: function (baUrl, uaKey, uaToken, dataType, formData, callback) {
+    saveDataInDataType: function (baUrl, taKey, taToken, dataType, formData, callback) {
         var vThis = this,
             options = {
                 url: util.format('%s/%s/%s.json', baUrl, dataType.namespace.toLowerCase(), dataType.slug),
-                headers: this.headers(uaKey, uaToken),
+                headers: this.headers(taKey, taToken),
                 method: 'POST',
                 json: true,
                 body: formData
@@ -81,16 +81,16 @@ module.exports = {
      * Search and return data type record with given name and namespace.
      *
      * @param baUrl {String} Base URL to CenitIO API.
-     * @param uaKey {String} CenitIO user access key.
-     * @param uaToken {String} CenitIO user access token.
+     * @param taKey {String} CenitIO tenant access key.
+     * @param taToken {String} CenitIO tenant access token.
      * @param dtNamespace {String} Data type namespace.
      * @param dtName {String} Data type name.
      * @param callback {Function} Callback function with error and data type record parameters.
      */
-    getDataType: function (baUrl, uaKey, uaToken, dtNamespace, dtName, callback) {
+    getDataType: function (baUrl, taKey, taToken, dtNamespace, dtName, callback) {
         var options = {
             url: util.format('%s/setup/json_data_type.json', baUrl),
-            headers: this.headers(uaKey, uaToken),
+            headers: this.headers(taKey, taToken),
             method: 'GET',
             json: true,
             qs: { limit: 1, namespace: dtNamespace, name: dtName }
@@ -106,18 +106,18 @@ module.exports = {
      * Create and return data type record with given name and namespace.
      *
      * @param baUrl {String} Base URL to CenitIO API.
-     * @param uaKey {String} CenitIO user access key.
-     * @param uaToken {String} CenitIO user access token.
+     * @param taKey {String} CenitIO tenant access key.
+     * @param taToken {String} CenitIO tenantv access token.
      * @param dtNamespace {String} Data type namespace.
      * @param dtName {String} Data type name.
      * @param formData {Object} Form data to be seved.
      * @param callback {Function} Callback function with error and data type record parameters.
      */
-    createDataType: function (baUrl, uaKey, uaToken, dtNamespace, dtName, formData, callback) {
+    createDataType: function (baUrl, taKey, taToken, dtNamespace, dtName, formData, callback) {
         var schema = this.parseJsonSchema(formData),
             options = {
                 url: util.format('%s/setup/json_data_type.json', baUrl),
-                headers: this.headers(uaKey, uaToken),
+                headers: this.headers(taKey, taToken),
                 method: 'POST',
                 json: true,
                 body: {
@@ -199,8 +199,8 @@ module.exports = {
                 return typeof v == 'String' && v.trim() != ''
             };
 
-        if (isValid(CenitIO.userAccessKey)) return callback(util.format(errMsg, 'userAccessKey'));
-        if (isValid(CenitIO.userAccessToken)) return callback(util.format(errMsg, 'userAccessToken'));
+        if (isValid(CenitIO.tenantAccessKey)) return callback(util.format(errMsg, 'tenantAccessKey'));
+        if (isValid(CenitIO.tenantAccessToken)) return callback(util.format(errMsg, 'tenantAccessToken'));
         if (isValid(CenitIO.dataType)) return callback(util.format(errMsg, 'dataType'));
         if (isValid(CenitIO.baseApiUrl)) return callback(util.format(errMsg, 'baseApiUrl'));
 
@@ -210,15 +210,15 @@ module.exports = {
     /**
      * Returns headers to be sent in CenitIO request.
      *
-     * @param uaKey {String} CenitIO user access key.
-     * @param uaToken {String} CenitIO user access token.
-     * @returns {{Content-Type: string, X-User-Access-Key: *, X-User-Access-Token: *}}
+     * @param taKey {String} CenitIO tenant access key.
+     * @param taToken {String} CenitIO tenant access token.
+     * @returns {{Content-Type: string, X-Tenant-Access-Key: *, X-Tenant-Access-Token: *}}
      */
-    headers: function (uaKey, uaToken) {
+    headers: function (taKey, taToken) {
         return {
             'Content-Type': 'application/json',
-            'X-User-Access-Key': uaKey,
-            'X-User-Access-Token': uaToken
+            'X-Tenant-Access-Key': taKey,
+            'X-Tenant-Access-Token': taToken
         };
     },
 
