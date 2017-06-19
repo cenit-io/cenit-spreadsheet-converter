@@ -3,7 +3,8 @@
  */
 
 var util = require('util'),
-    request = require('request');
+    request = require('request'),
+    inflection = require('inflection');
 
 module.exports = {
     /**
@@ -20,21 +21,24 @@ module.exports = {
         formData = this.parseData(formData);
 
         vThis.validate(CenitIO, function (err) {
-            if (err) return callback(500, vThis.renderView(500, err));
+            if (err) return callback(500, err);
 
-            var taKey = CenitIO.tenantAccessKey.trim(),
-                taToken = CenitIO.tenantAccessToken.trim(),
+            var taKey = vThis.getTenantAccessKey(CenitIO),
+                taToken = vThis.getTenantAccessToken(CenitIO),
                 dtName = CenitIO.dataTypeName.trim(),
                 dtNamespace = CenitIO.dataTypeNamespace.trim(),
+                dtNamespaceSlug = CenitIO.dataTypeNamespaceSlug || inflection.underscore(dtNamespace).trim(),
                 baUrl = CenitIO.baseApiUrl.trim().replace(/\/$/, '');
 
             vThis.getDataType(baUrl, taKey, taToken, dtNamespace, dtName, function (err, dataType) {
-                if (err) return callback(500, vThis.renderView(500, err));
+                if (err) return callback(500, err);
                 if (dataType) {
+                    dataType.namespaceSlug = dtNamespaceSlug;
                     vThis.saveDataInDataType(baUrl, taKey, taToken, dataType, formData, callback);
                 } else {
                     vThis.createDataType(baUrl, taKey, taToken, dtNamespace, dtName, formData, function (err, dataType) {
-                        if (err) return callback(500, vThis.renderView(500, err));
+                        if (err) return callback(500, err);
+                        dataType.namespaceSlug = dtNamespaceSlug;
                         vThis.saveDataInDataType(baUrl, taKey, taToken, dataType, formData, callback);
                     });
                 }
@@ -55,7 +59,7 @@ module.exports = {
     saveDataInDataType: function (baUrl, taKey, taToken, dataType, formData, callback) {
         var vThis = this,
             options = {
-                url: util.format('%s/%s/%s.json', baUrl, dataType.namespace.toLowerCase(), dataType.slug),
+                url: util.format('%s/%s/%s.json', baUrl, dataType.namespaceSlug, dataType.slug),
                 headers: this.headers(taKey, taToken),
                 method: 'POST',
                 json: true,
@@ -70,10 +74,10 @@ module.exports = {
                 status = 500;
             } else {
                 msg = 'Data was successfully saved.';
-                status = 422;
+                status = 200;
             }
 
-            callback(status, vThis.renderView(status, msg));
+            callback(status, msg);
         });
     },
 
@@ -133,6 +137,37 @@ module.exports = {
         });
     },
 
+    getSelectionItemOptions: function (selItemSetting, CenitIO, callback) {
+        var taKey = this.getTenantAccessKey(CenitIO),
+            taToken = this.getTenantAccessToken(CenitIO),
+            baUrl = CenitIO.baseApiUrl.trim().replace(/\/$/, ''),
+            apiService = selItemSetting.apiService,
+            rField = selItemSetting.rField,
+            vField = selItemSetting.vField,
+            lField = selItemSetting.lField,
+
+            options = {
+                url: util.format('%s/%s', baUrl, apiService),
+                headers: this.headers(taKey, taToken),
+                method: 'GET',
+                json: true
+            };
+
+        request(options, function (err, response, resData) {
+            if (err || resData.summary) return callback(500, err || resData.summary);
+
+            var records = resData[rField] || [],
+                options = records.map(function (record) {
+                    return {
+                        id: record[vField],
+                        text: record[lField]
+                    }
+                });
+
+            callback(200, options);
+        });
+    },
+
     /**
      * Parse json schema from formData.
      *
@@ -188,6 +223,26 @@ module.exports = {
     },
 
     /**
+     * Get tenant access key from CenitIO settings or TENANT_ACCESS_KEY environment.
+     *
+     * @param CenitIO
+     * @returns {string}
+     */
+    getTenantAccessKey: function (CenitIO) {
+        return (CenitIO.tenantAccessKey || process.env.TENANT_ACCESS_KEY).trim()
+    },
+
+    /**
+     * Get tenant access token from CenitIO settings or TENANT_ACCESS_TOKEN environment.
+     *
+     * @param CenitIO
+     * @returns {string}
+     */
+    getTenantAccessToken: function (CenitIO) {
+        return (CenitIO.tenantAccessToken || process.env.TENANT_ACCESS_TOKEN).trim()
+    },
+
+    /**
      * Validate CenitIO connection setting.
      *
      * @param CenitIO {Object} CenitIO connection setting.
@@ -196,13 +251,12 @@ module.exports = {
     validate: function (CenitIO, callback) {
         var errMsg = 'CenitIO.%s is a required string, please set it to the config.json file.',
             isValid = function (v) {
-                return typeof v == 'String' && v.trim() != ''
+                return typeof v == 'string' && v.trim() != ''
             };
 
-        if (isValid(CenitIO.tenantAccessKey)) return callback(util.format(errMsg, 'tenantAccessKey'));
-        if (isValid(CenitIO.tenantAccessToken)) return callback(util.format(errMsg, 'tenantAccessToken'));
-        if (isValid(CenitIO.dataType)) return callback(util.format(errMsg, 'dataType'));
-        if (isValid(CenitIO.baseApiUrl)) return callback(util.format(errMsg, 'baseApiUrl'));
+        if (!isValid(CenitIO.dataTypeName)) return callback(util.format(errMsg, 'dataTypeName'));
+        if (!isValid(CenitIO.dataTypeNamespace)) return callback(util.format(errMsg, 'dataTypeNamespace'));
+        if (!isValid(CenitIO.baseApiUrl)) return callback(util.format(errMsg, 'baseApiUrl'));
 
         callback();
     },
@@ -220,21 +274,5 @@ module.exports = {
             'X-Tenant-Access-Key': taKey,
             'X-Tenant-Access-Token': taToken
         };
-    },
-
-    /**
-     * Render view.
-     *
-     * @param status {Integer} Http response status.
-     * @param msg {String} Response message
-     * @returns {String} Response html
-     */
-    renderView: function (status, msg) {
-        // TODO: Customise view.
-        var tmpl = '' +
-            '<div style="border: 1px solid gray; background-color: %s; padding: 1.5em; text-align: center;">%s</div>' +
-            '<script type="text/javascript">setTimeout(function () { window.location = "/" }, 5000)</script>';
-
-        return util.format(tmpl, status == 500 ? 'red' : '#c9e2b3', msg.toString());
     }
 };

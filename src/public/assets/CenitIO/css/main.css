@@ -1,0 +1,21 @@
+.select2-container .select2-selection--single,
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 34px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 34px;
+}
+
+#loading {
+    width: 210px;
+    padding: 10px;
+    background-color: transparent;
+    height: 40px;
+    position: fixed;
+    top: calc(50% - 20px);
+    left: calc(50% - 100px);
+    border-radius: 10px;
+    border: 1px inset lightgrey;
+    overflow: hidden;
+}

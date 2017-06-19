@@ -36,44 +36,67 @@ Add CenitIO connection setting to 'config.js' file. Open 'config.js' in your edi
     "baseApiUrl": "https://cenit.io/api/v2",
     "dataTypeName": "spreadsheet_test",
     "dataTypeNamespace": "Basic",
+    "dataTypeNamespaceSlug": null,
     "tenantAccessKey": "**********",
-    "tenantAccessToken": "********************"
+    "tenantAccessToken": "********************",
+    
+    "selectionItems": {
+      "XLEW_1_6_2": {
+        "remote": {
+          "apiService": "data_service/data1",
+          "rField": "data1s",
+          "vField": "ci",
+          "lField": "name"
+        }
+      },
+
+      "XLEW_1_7_3": {
+        "options": [
+          {"value": 1, "label": "A"},
+          {"value": 2, "label": "B"},
+          {"value": 3, "label": "C"}
+        ]
+      },
+
+      "XLEW_1_7_4": {
+        "options": ["yes","no"]
+      }
+    }
   }
 }
 ```
 
-Include CenitIOController in your Node.js application folder. Now you need to edit app.js to handle the form save 
-post request from browser. Open app.js in your editor and paste this snippet code:
+#### Parameters description:
 
+* **baseApiUrl:**             (REQUIRED) Base URL to CenitIO API.
+* **dataTypeName:**           (REQUIRED) Data type name.
+* **dataTypeNamespace:**      (REQUIRED) Data type namespace.
+* **dataTypeNamespaceSlug:**  (OPTIONAL) Data type namespace slug. If dtNamespaceSlug value is undefined, null or false, 
+                                         then will be requested in the submit action.
+                                         
+* **tenantAccessKey:**        (OPTIONAL) Tenant access key. If key value is undefined, null or false, then will be 
+                                         take form TENANT_ACCESS_KEY environment.
+                                         
+* **tenantAccessToken:**      (OPTIONAL) Tenant access key. If token value is undefined, null or false, then will be 
+                                         take form TENANT_ACCESS_TOKEN environment.
+                                  
+* **selectionItems:**   (OPTIONAL) Configuration of items that will be transformed in select box components. The name of 
+                                   each element setting must be the value of the id attribute of the field in the form.
+                                   The value can be the configuration to obtain the options from a remote service of 
+                                   CenitIO or it can be the list of options.
+                                   
+* **options:**          (OPTIONAL) List (array) of static options. Each option can be an object if value is different to 
+                                   label such as ``{ value: '1', label: 'A' }``, or a single value if it is equal to label.
+                                   
+* **remote:**           (OPTIONAL) Configuration to obtain the options from a remote service of CenitIO.
 
-```javascript
-var CenitIOController = require('cenit-spreadsheet-converter');
-
-app.post('/postform', function(req, res){
-    CenitIOController.saveFormData(req.body, config.CenitIO, function (status, msg) {
-        res.status(status).send(msg);
-    });
-});
-```
-
-That's it, you are done with server part. 
-Now come to the final part to edit, yes you are right, let's give the client side page a server address to post the form. 
-Go to views folder and open index.ejs in editor, now at html form tag, change the default action url: 
-**https://www.spreadsheetserver.com/server1/g/submit/submit.aspx** to your node server **/postform**. 
-
-The index.ejs may look similar to this:
- 
-```html
-<!DOCTYPE HTML>
-<!-- saved from url=(0013)about:internet -->
-<html>
-  ...
-  <form id='formc' name='formc' method='post' action='/postform' target='_top'>
-    ...
-  </form>
-...
-</html>            
-```
+* **apiService:**       (REQUIRED) Url to REST API service in CenitIO. It is (Namespace slug/Model slug).
+* **rField:**           (REQUIRED) Attribute name that contain the records. Usually it is the resource name pluralization.
+* **vField:**           (REQUIRED) Record attribute use to get option value.
+* **lField:**           (REQUIRED) Record attribute use to get option label.
+                             
+                             
+### Conclusion
 
 You are done now, you have configured the SpreadsheetConverter Node.js calculator app to your CenitIO Tenant to persist your form.
 
