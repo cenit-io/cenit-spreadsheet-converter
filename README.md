@@ -35,7 +35,7 @@ Add CenitIO connection setting to 'config.js' file. Open 'config.js' in your edi
   "CenitIO": {
     "baseApiUrl": "https://cenit.io/api/v2",
     "dataTypeName": "spreadsheet_test",
-    "dataTypeNamespace": "Basic",
+    "dataTypeNamespace": "DataService",
     "dataTypeNamespaceSlug": null,
     "tenantAccessKey": "**********",
     "tenantAccessToken": "********************",
