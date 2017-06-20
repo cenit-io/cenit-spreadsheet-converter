@@ -243,7 +243,7 @@ module.exports = {
      * @returns {string}
      */
     getTenantAccessKey: function (CenitIO) {
-        return (CenitIO.tenantAccessKey || process.env.TENANT_ACCESS_KEY).trim()
+        return (CenitIO.tenantAccessKey || process.env.TENANT_ACCESS_KEY || '').trim()
     },
 
     /**
@@ -253,7 +253,7 @@ module.exports = {
      * @returns {string}
      */
     getTenantAccessToken: function (CenitIO) {
-        return (CenitIO.tenantAccessToken || process.env.TENANT_ACCESS_TOKEN).trim()
+        return (CenitIO.tenantAccessToken || process.env.TENANT_ACCESS_TOKEN || '').trim()
     },
 
     /**
