@@ -52,14 +52,14 @@ Add CenitIO connection setting to 'config.js' file. Open 'config.js' in your edi
 
       "field_id_2": {
         "options": [
-          {"value": 1, "label": "A"},
-          {"value": 2, "label": "B"},
-          {"value": 3, "label": "C"}
+          {"value": 100, "label": "A"},
+          {"value": 200, "label": "B"},
+          {"value": 300, "label": "C"}
         ]
       },
 
       "field_id_3": {
-        "options": ["yes","no"]
+        "options": [100, 200]
       }
     }
   }
