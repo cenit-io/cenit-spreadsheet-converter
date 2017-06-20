@@ -31,13 +31,13 @@ module.exports = {
                 baUrl = CenitIO.baseApiUrl.trim().replace(/\/$/, '');
 
             vThis.getDataType(baUrl, taKey, taToken, dtNamespace, dtName, function (err, dataType) {
-                if (err) return callback(500, err);
+                if (err) return callback(err.statusCode, err.statusMessage);
                 if (dataType) {
                     dataType.namespaceSlug = dtNamespaceSlug;
                     vThis.saveDataInDataType(baUrl, taKey, taToken, dataType, formData, callback);
                 } else {
                     vThis.createDataType(baUrl, taKey, taToken, dtNamespace, dtName, formData, function (err, dataType) {
-                        if (err) return callback(500, err);
+                        if (err) return callback(err.statusCode, err.statusMessage);
                         dataType.namespaceSlug = dtNamespaceSlug;
                         vThis.saveDataInDataType(baUrl, taKey, taToken, dataType, formData, callback);
                     });
@@ -54,7 +54,7 @@ module.exports = {
      * @param taToken {String} CenitIO tenant access token.
      * @param dataType {Object} Data type record.
      * @param formData {Object} Form data to be seved.
-     * @param callback {Function} Callback function with status and menssage response parameters.
+     * @param callback {Function} Callback function with status and message response parameters.
      */
     saveDataInDataType: function (baUrl, taKey, taToken, dataType, formData, callback) {
         var vThis = this,
@@ -67,17 +67,14 @@ module.exports = {
             };
 
         request(options, function (err, response, resData) {
-            var msg, status;
+            if (err) return callback(500, err);
 
-            if (err || resData.summary) {
-                msg = err.toString() || resData.summary;
-                status = 500;
-            } else {
-                msg = 'Data was successfully saved.';
-                status = 200;
-            }
+            var statusCode = response.statusCode,
+                statusMessage = resData.summary || resData.error || response.statusMessage;
 
-            callback(status, msg);
+            if (statusCode >= 400) return callback(statusCode, statusMessage);
+
+            callback(statusCode, 'Data was successfully saved.');
         });
     },
 
@@ -101,7 +98,13 @@ module.exports = {
         };
 
         request(options, function (err, response, resData) {
-            if (err || resData.summary) return callback(err || resData.summary);
+            if (err) return callback({ statusCode: 500, statusMessage: err });
+
+            var statusCode = response.statusCode,
+                statusMessage = resData.summary || resData.error || response.statusMessage;
+
+            if (statusCode >= 400) return callback({ statusCode: statusCode, statusMessage: statusMessage });
+
             callback(null, resData.json_data_types[0]);
         });
     },
@@ -132,7 +135,13 @@ module.exports = {
             };
 
         request(options, function (err, response, resData) {
-            if (err || resData.summary) return callback(err || resData.summary);
+            if (err) return callback({ statusCode: 500, statusMessage: err });
+
+            var statusCode = response.statusCode,
+                statusMessage = resData.summary || resData.error || response.statusMessage;
+
+            if (statusCode >= 400) return callback({ statusCode: statusCode, statusMessage: statusMessage });
+
             callback(null, resData.success.json_data_type);
         });
     },
@@ -154,7 +163,12 @@ module.exports = {
             };
 
         request(options, function (err, response, resData) {
-            if (err || resData.summary) return callback(500, err || resData.summary);
+            if (err) return callback(500, err);
+
+            var statusCode = response.statusCode,
+                statusMessage = resData.summary || resData.error || response.statusMessage;
+
+            if (statusCode >= 400) return callback(statusCode, statusMessage);
 
             var records = resData[rField] || [],
                 options = records.map(function (record) {
