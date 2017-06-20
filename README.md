@@ -37,8 +37,8 @@ Add CenitIO connection setting to 'config.js' file. Open 'config.js' in your edi
     "dataTypeName": "spreadsheet_test",
     "dataTypeNamespace": "DataService",
     "dataTypeNamespaceSlug": null,
-    "tenantAccessKey": "**********",
-    "tenantAccessToken": "********************",
+    "tenantAccessKey": "",
+    "tenantAccessToken": "",
     
     "selectionItems": {
       "field_id_1": {
