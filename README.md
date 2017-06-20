@@ -41,7 +41,7 @@ Add CenitIO connection setting to 'config.js' file. Open 'config.js' in your edi
     "tenantAccessToken": "********************",
     
     "selectionItems": {
-      "XLEW_1_6_2": {
+      "field_id_1": {
         "remote": {
           "apiService": "data_service/data1",
           "rField": "data1s",
@@ -50,7 +50,7 @@ Add CenitIO connection setting to 'config.js' file. Open 'config.js' in your edi
         }
       },
 
-      "XLEW_1_7_3": {
+      "field_id_2": {
         "options": [
           {"value": 1, "label": "A"},
           {"value": 2, "label": "B"},
@@ -58,7 +58,7 @@ Add CenitIO connection setting to 'config.js' file. Open 'config.js' in your edi
         ]
       },
 
-      "XLEW_1_7_4": {
+      "field_id_3": {
         "options": ["yes","no"]
       }
     }
