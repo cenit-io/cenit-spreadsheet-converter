@@ -17,7 +17,7 @@ npm install cenit-io/cenit-spreadsheet-converter --save
 
 ### Usage
 
-Add CenitIO connection setting to 'config.js' file. Open 'config.js' in your editor and customize this snippet code:
+Add CenitIO connection setting to 'config.json' file. Open 'config.json' in your editor and customize this snippet code:
 
 ```json
 {
