@@ -159,8 +159,11 @@ module.exports = {
                 url: util.format('%s/%s', baUrl, apiService),
                 headers: this.headers(taKey, taToken),
                 method: 'GET',
-                json: true
+                json: true,
+                qs: { page: selItemSetting.page, limit: 25 }
             };
+
+        if (selItemSetting.q) options.qs[lField] = { "$regex": ".*" + selItemSetting.q + ".*", "$options": 'i' };
 
         request(options, function (err, response, resData) {
             if (err) return callback(500, err);
@@ -178,7 +181,7 @@ module.exports = {
                     }
                 });
 
-            callback(200, options);
+            callback(200, { total_count: resData.count, items: options });
         });
     },
 

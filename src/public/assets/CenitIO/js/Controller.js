@@ -71,7 +71,7 @@
          * Create selection boxes.
          */
         createSelectionBoxes: function (callback) {
-            var vThis =  this;
+            var vThis = this;
 
             $.ajax({
                 url: '/selectionItems',
@@ -96,10 +96,7 @@
 
                     selItems.forEach(function (selItem, idx) {
                         if (selectionItems[selItem].remote) {
-                            vThis.getRemoteOptions(selectionItems[selItem].remote, function (err, options) {
-                                if (err) return callback(500, err, idx == selItems.length - 1);
-                                create(selItem, idx, { data: options });
-                            });
+                            create(selItem, idx, vThis.getRemoteOptions(selectionItems[selItem].remote));
                         } else {
                             vThis.getStaticOptions(selectionItems[selItem], function (options) {
                                 create(selItem, idx, { data: options });
@@ -142,23 +139,37 @@
             callback(options);
         },
 
-        getRemoteOptions: function (setting, callback) {
-            $.ajax({
-                url: '/selectionItemOptions',
-                method: 'POST',
-                dataType: 'json',
-                data: setting,
-
-                success: function (options, textStatus, jqXHR) {
-                    callback(null, options);
+        getRemoteOptions: function (setting) {
+            return {
+                ajax: {
+                    url: "/selectionItemOptions",
+                    method: 'POST',
+                    dataType: 'json',
+                    data: setting,
+                    delay: 250,
+                    data: function (params) {
+                        setting.q = params.term;
+                        setting.page = params.page;
+                        console.log(setting);
+                        return setting;
+                    },
+                    processResults: function (data, params) {
+                        console.log(data);
+                        params.page = params.page || 1;
+                        return {
+                            results: data.items,
+                            pagination: {
+                                more: (params.page * 30) < data.total_count
+                            }
+                        };
+                    },
+                    cache: true
                 },
-
-                error: function (jqXHR, textStatus, errorThrown) {
-                    callback("Request failed ({0}), can't be accessed to ({1}) service.".format(
-                        errorThrown || textStatus, setting.apiService
-                    ));
-                }
-            });
+                escapeMarkup: function (markup) { return markup; },
+                minimumInputLength: 1,
+                //     templateResult: formatRepo, // omitted for brevity, see the source of this page
+                // templateSelection: formatRepoSelection // omitted for brevity, see the source of this page
+            };
         }
     };
 
@@ -227,6 +238,3 @@
 
 
 }(jQuery));
-
-
-
