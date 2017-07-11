@@ -152,7 +152,6 @@
                         return setting;
                     },
                     processResults: function (data, params) {
-                        console.log(data);
                         params.page = params.page || 1;
                         return {
                             results: data.items,
