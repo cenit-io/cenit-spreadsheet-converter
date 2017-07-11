@@ -149,7 +149,6 @@
                     data: function (params) {
                         setting.q = params.term;
                         setting.page = params.page;
-                        console.log(setting);
                         return setting;
                     },
                     processResults: function (data, params) {
