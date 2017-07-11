@@ -145,7 +145,6 @@
                     url: "/selectionItemOptions",
                     method: 'POST',
                     dataType: 'json',
-                    data: setting,
                     delay: 250,
                     data: function (params) {
                         setting.q = params.term;
