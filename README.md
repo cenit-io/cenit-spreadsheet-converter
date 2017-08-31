@@ -61,7 +61,9 @@ Add CenitIO connection setting to 'config.json' file. Open 'config.json' in your
       "field_id_3": {
         "options": [100, 200]
       }
-    }
+    },
+    
+    "signatureItems": ["field_id_4", "field_id_5"]
   }
 }
 ```

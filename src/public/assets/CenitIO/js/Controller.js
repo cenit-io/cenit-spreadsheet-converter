@@ -99,9 +99,90 @@
                             create(selItem, idx, vThis.getRemoteOptions(selectionItems[selItem].remote));
                         } else {
                             vThis.getStaticOptions(selectionItems[selItem], function (options) {
-                                create(selItem, idx, { data: options });
+                                create(selItem, idx, {data: options});
                             });
                         }
+                    }, this);
+                },
+
+                error: function (jqXHR, textStatus, errorThrown) {
+                    callback(500, "Request failed ({0}), data can't be saved.".format(errorThrown || textStatus));
+                }
+            });
+        },
+
+        /**
+         * Create signature boxes.
+         */
+        createSignatureBoxes: function (callback) {
+            $('body').append(
+                '<div id="signature">' +
+                '<canvas/>' +
+                '<div class="actions">' +
+                '<button id="clear">Clear</button>' +
+                '<button id="cancel">Cancel</button>' +
+                '<button id="save">Save</button>' +
+                '</div>' +
+                '</div>'
+            );
+
+            var $signature = $('div#signature'),
+                $canvas = $('div#signature canvas'),
+                signaturePad = new SignaturePad($canvas[0]);
+
+            $('#clear').on('click', function (e) {
+                signaturePad.clear();
+                e.preventDefault();
+            });
+
+            $('#cancel').on('click', function (e) {
+                $signature.hide();
+                e.preventDefault();
+            });
+
+            $('#save').on('click', function (e) {
+                var $img = $('img[data-field={0}]'.format(signaturePad.currentField)),
+                    $field = $('input[name={0}]'.format(signaturePad.currentField)),
+                    src = signaturePad.toDataURL("image/svg+xml");
+
+                $img.prop('src', src);
+                $field.val(src);
+                $signature.hide();
+                e.preventDefault();
+            });
+
+            $.ajax({
+                url: '/signatureItems',
+                method: 'GET',
+                dataType: 'json',
+
+                success: function (signatureItems, textStatus, jqXHR) {
+                    signatureItems.forEach(function (field, idx) {
+                        var $el = $("#{0}".format(field)),
+                            $parent = $el.parent(),
+                            classes = $el.prop('class'),
+                            ratio = Math.max(window.devicePixelRatio || 1, 1),
+                            $img, $field;
+
+                        $el.remove();
+                        $parent.append('<input name="{0}" type="hidden">'.format(field));
+                        $parent.append('<img class="{1} signature" data-field="{0}"/>'.format(field, classes));
+
+                        $img = $("img[data-field={0}]".format(field));
+                        $field = $("input[name={0}]".format(field));
+
+                        $img.on('click', function (e) {
+                            $signature.show();
+                            $signature.height($(window).height() * 0.8);
+                            $canvas[0].width = $canvas[0].offsetWidth * ratio;
+                            $canvas[0].height = $canvas[0].offsetHeight * ratio;
+                            $canvas[0].getContext("2d").scale(ratio, ratio);
+                            signaturePad.clear();
+                            signaturePad.currentField = $(this).data('field');
+                            signaturePad.fromDataURL($field.val());
+                        });
+
+                        if (idx == signatureItems.length - 1) callback(200, null, true);
                     }, this);
                 },
 
@@ -128,8 +209,8 @@
 
         getStaticOptions: function (selItem, callback) {
             var options = (selItem.options || ['not-options']).map(function (o) {
-                if ($.isString(o) || $.isNumeric(o)) return { id: o, text: o };
-                if ($.isBoolean(o)) return { id: o, text: o ? 'true' : 'false' };
+                if ($.isString(o) || $.isNumeric(o)) return {id: o, text: o};
+                if ($.isBoolean(o)) return {id: o, text: o ? 'true' : 'false'};
                 if ($.isPlainObject(o)) return {
                     id: o.value == undefined ? o.id : o.value,
                     text: o.label == undefined ? o.text : o.label
@@ -162,7 +243,9 @@
                     },
                     cache: true
                 },
-                escapeMarkup: function (markup) { return markup; },
+                escapeMarkup: function (markup) {
+                    return markup;
+                },
                 minimumInputLength: 1
             };
         }
@@ -226,6 +309,13 @@
         // Create selection boxes.
         CenitIO.startLoading();
         CenitIO.createSelectionBoxes(function (status, msg, finish) {
+            if (msg) alert(msg);
+            if (finish) CenitIO.stopLoading();
+        });
+
+        // Create signature boxes.
+        CenitIO.startLoading();
+        CenitIO.createSignatureBoxes(function (status, msg, finish) {
             if (msg) alert(msg);
             if (finish) CenitIO.stopLoading();
         });

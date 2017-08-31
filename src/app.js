@@ -47,5 +47,9 @@ app.post('/selectionItemOptions', function (req, res) {
     });
 });
 
+app.get('/signatureItems', function (req, res) {
+    res.send(JSON.stringify(config.CenitIO.signatureItems || []));
+});
+
 //---------start server-------
 http.createServer(app).listen(config.port || 3002);
