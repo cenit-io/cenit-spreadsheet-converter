@@ -165,7 +165,7 @@
                             $img, $field;
 
                         $el.remove();
-                        $parent.append('<input name="{0}" type="hidden">'.format(field));
+                        $parent.append('<input name="{0}" id="{0}" type="hidden">'.format(field));
                         $parent.append('<img class="{1} signature" data-field="{0}"/>'.format(field, classes));
 
                         $img = $("img[data-field={0}]".format(field));
