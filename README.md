@@ -96,6 +96,9 @@ Add CenitIO connection setting to 'config.json' file. Open 'config.json' in your
 * **rField:**           (REQUIRED) Attribute name that contain the records. Usually it is the resource name pluralization.
 * **vField:**           (REQUIRED) Record attribute use to get option value.
 * **lField:**           (REQUIRED) Record attribute use to get option label.
+
+* **signatureItems:**   (OPTIONAL) Configuration of items that will be transformed in signature box components.
+
                              
                              
 ### Conclusion
